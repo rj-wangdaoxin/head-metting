@@ -11,9 +11,19 @@ export interface LoginUser {
   name: string;
 }
 
-export function LoginPanel({ users, next }: { users: LoginUser[]; next: string }) {
+export function LoginPanel({
+  users,
+  next,
+  allowSignup = true,
+}: {
+  users: LoginUser[];
+  next: string;
+  allowSignup?: boolean;
+}) {
   const router = useRouter();
-  const [mode, setMode] = useState<'login' | 'register'>(users.length > 0 ? 'login' : 'register');
+  const [mode, setMode] = useState<'login' | 'register'>(
+    allowSignup && users.length === 0 ? 'register' : 'login',
+  );
   const [name, setName] = useState(users[0]?.name ?? '');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -138,18 +148,22 @@ export function LoginPanel({ users, next }: { users: LoginUser[]; next: string }
         </form>
 
         <div className="mt-5 border-t border-paper-line pt-4 text-center">
-          <button
-            type="button"
-            onClick={() => {
-              setMode(isRegister ? 'login' : 'register');
-              setError(null);
-              setPassword('');
-              setConfirm('');
-            }}
-            className="text-xs text-indigo hover:underline"
-          >
-            {isRegister ? '已有账号，回去入座' : '另立新账号'}
-          </button>
+          {allowSignup ? (
+            <button
+              type="button"
+              onClick={() => {
+                setMode(isRegister ? 'login' : 'register');
+                setError(null);
+                setPassword('');
+                setConfirm('');
+              }}
+              className="text-xs text-indigo hover:underline"
+            >
+              {isRegister ? '已有账号，回去入座' : '另立新账号'}
+            </button>
+          ) : (
+            <p className="text-xs text-ink-mute">本站不开放新立账号，账号由站长分发</p>
+          )}
           <p className="mt-3 text-[11px] leading-5 text-ink/45">
             各账号的分身、辩录与后台配置互相隔离，彼此看不见。
           </p>

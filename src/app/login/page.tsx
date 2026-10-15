@@ -1,5 +1,5 @@
 import { LoginPanel } from '@/components/auth/LoginPanel';
-import { listUserNames } from '@/lib/auth';
+import { isSignupAllowed, listUserNames } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,5 +15,14 @@ export default async function LoginPage({
   const hideList = (process.env.HIDE_ACCOUNT_LIST ?? '').trim() === 'true';
   const users = hideList ? [] : await listUserNames();
 
-  return <LoginPanel users={users.map((u) => ({ id: u.id, name: u.name }))} next={next} />;
+  // 设 ALLOW_SIGNUP=false 后关闭注册入口，账号由站长手工分发
+  const allowSignup = await isSignupAllowed();
+
+  return (
+    <LoginPanel
+      users={users.map((u) => ({ id: u.id, name: u.name }))}
+      next={next}
+      allowSignup={allowSignup}
+    />
+  );
 }

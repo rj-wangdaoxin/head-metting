@@ -36,6 +36,10 @@ npm run dev     # http://localhost:3000
 
 完整步骤见 [部署到 Render](./docs/部署到Render.md)。
 
+**不想上云、或模型接口只在内网可达？** 也可以用 Cloudflare 免费隧道把本机站点临时开放给他人：不用服务器、不用信用卡，几分钟就能拿到公网地址，代价是电脑必须开着、地址每次启动会变。启动与关闭的完整命令见 [内网穿透分享](./docs/内网穿透分享.md)。
+
+分享给陌生人前，建议设 `ALLOW_SIGNUP=false` 关闭注册（账号由你手工发），配合 `ADMIN_PASSWORD` 与 `HIDE_ACCOUNT_LIST=true` 使用。
+
 完整文档见 [`docs/`](./docs/README.md)：
 
 - [文档总览与快速开始](./docs/README.md)
@@ -45,3 +49,4 @@ npm run dev     # http://localhost:3000
 - [辩论机制说明](./docs/辩论机制说明.md)
 - [技术架构](./docs/技术架构.md)
 - [部署到 Render](./docs/部署到Render.md)
+- [内网穿透分享](./docs/内网穿透分享.md)

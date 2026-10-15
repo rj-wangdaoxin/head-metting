@@ -95,6 +95,16 @@ export async function hasAnyUser(): Promise<boolean> {
   return (await prisma.user.count()) > 0;
 }
 
+/**
+ * 是否允许新建账号：设 ALLOW_SIGNUP=false 即关闭注册，账号由站长手工分发。
+ * 库里一个账号都没有时始终放行——否则新部署的站谁也进不去。
+ */
+export async function isSignupAllowed(): Promise<boolean> {
+  const flag = (process.env.ALLOW_SIGNUP ?? '').trim().toLowerCase();
+  if (flag !== 'false') return true;
+  return (await prisma.user.count()) === 0;
+}
+
 export const SESSION_COOKIE_OPTIONS = {
   httpOnly: true,
   sameSite: 'lax' as const,

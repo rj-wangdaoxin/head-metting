@@ -3,6 +3,7 @@ node_modules
 out
 build
 *.log
+*.tsbuildinfo
 .DS_Store
 
 # 本地数据库与密钥（含备份）

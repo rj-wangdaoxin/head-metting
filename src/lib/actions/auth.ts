@@ -8,6 +8,7 @@ import {
   changePassword,
   createUser,
   getCurrentUser,
+  isSignupAllowed,
   sessionCookieValue,
   verifyCredentials,
 } from '@/lib/auth';
@@ -39,6 +40,8 @@ export async function registerAction(input: {
   password: string;
   confirm: string;
 }): Promise<AuthActionResult> {
+  if (!(await isSignupAllowed())) return fail('本站已停止新立账号，请向站长索取');
+
   const password = input?.password ?? '';
   if (password !== (input?.confirm ?? '')) return fail('两次输入的口令不一致');
 
