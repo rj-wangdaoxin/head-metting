@@ -1,0 +1,44 @@
+# Render Blueprint：https://render.com/docs/blueprints
+# 用法：把仓库推到 GitHub 后，在 Render 选 New → Blueprint，指向本仓库即可。
+services:
+  - type: web
+    name: head-metting
+    runtime: node
+    plan: free
+    # 新加坡节点离国内较近；也可改 oregon / frankfurt
+    region: singapore
+    branch: main
+    buildCommand: |
+      npm install
+      npm run avatars
+      npx prisma generate --schema prisma/schema.postgres.prisma
+      npx prisma db push --schema prisma/schema.postgres.prisma --skip-generate
+      npx tsx prisma/seed.ts
+      npm run build
+    startCommand: npm start
+    healthCheckPath: /login
+    envVars:
+      - key: NODE_VERSION
+        value: '22'
+      # 免费实例只有 512MB，限制堆上限以免构建期被 OOM kill
+      - key: NODE_OPTIONS
+        value: '--max-old-space-size=450'
+      # 以下四项需在 Render 面板里填写（sync: false 表示不由 Blueprint 生成）
+      - key: DATABASE_URL
+        sync: false
+      - key: APP_SECRET
+        generateValue: true
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: LLM_BASE_URL
+        sync: false
+      - key: LLM_API_KEY
+        sync: false
+      - key: LLM_MODEL
+        sync: false
+      - key: LLM_TEMPERATURE
+        value: '0.9'
+      - key: LLM_MAX_TOKENS
+        value: '1200'
+      - key: LLM_TIMEOUT_MS
+        value: '120000'

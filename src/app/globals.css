@@ -1,0 +1,142 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --ink: #2b2b28;
+    --paper: #f6f1e7;
+    --cinnabar: #9e3b2e;
+    --indigo: #35566b;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    @apply bg-paper text-ink font-sans;
+    background-image:
+      radial-gradient(circle at 12% 8%, rgba(158, 59, 46, 0.05), transparent 34%),
+      radial-gradient(circle at 88% 4%, rgba(53, 86, 107, 0.06), transparent 38%),
+      radial-gradient(circle at 50% 100%, rgba(184, 134, 11, 0.05), transparent 46%);
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    @apply bg-cinnabar/20;
+  }
+
+  input,
+  textarea,
+  select {
+    @apply bg-transparent;
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus,
+  button:focus {
+    outline: none;
+  }
+
+  button:not(:disabled),
+  [role='button']:not(:disabled),
+  summary {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+}
+
+@layer components {
+  /* 卷轴卡片 */
+  .scroll-card {
+    @apply relative rounded-sm border border-paper-line bg-paper-card shadow-scroll transition-all duration-300;
+  }
+
+  .scroll-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba(43, 43, 40, 0.04);
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  /* 竖排文字 */
+  .vertical-text {
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    letter-spacing: 0.18em;
+  }
+
+  /* 宣纸输入框 */
+  .ink-input {
+    @apply w-full rounded-sm border border-paper-line bg-white/70 px-3 py-2 text-sm text-ink
+      transition-colors duration-200 placeholder:text-ink/35
+      hover:border-ink/30 focus:border-cinnabar/60 focus:bg-white;
+  }
+
+  /* 墨迹按钮 */
+  .ink-btn {
+    @apply inline-flex shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-sm px-4 py-2
+      text-sm font-medium transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-40;
+  }
+
+  .ink-btn-primary {
+    @apply ink-btn bg-ink text-paper hover:bg-ink-soft active:scale-[0.98];
+  }
+
+  .ink-btn-seal {
+    @apply ink-btn bg-cinnabar text-white shadow-seal hover:bg-cinnabar-soft active:scale-[0.98];
+  }
+
+  .ink-btn-ghost {
+    @apply ink-btn border border-paper-line bg-white/60 text-ink hover:border-ink/40 hover:bg-white active:scale-[0.98];
+  }
+
+  /* 朱红小标题（带左侧墨条） */
+  .ink-label {
+    @apply relative pl-3 text-xs font-medium tracking-[0.2em] text-ink-mute;
+  }
+
+  .ink-label::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 12px;
+    background: var(--cinnabar);
+    border-radius: 1px;
+  }
+}
+
+@layer utilities {
+  .text-justify-cn {
+    text-align: justify;
+    text-justify: inter-ideograph;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .thin-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .thin-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(43, 43, 40, 0.18);
+    border-radius: 999px;
+  }
+
+  .thin-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "name": "historical-figures-platform",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbo",
+    "dev:webpack": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "db:push": "prisma db push",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:setup": "prisma db push && tsx prisma/seed.ts",
+    "db:reset": "prisma db push --force-reset && tsx prisma/seed.ts",
+    "db:push:pg": "prisma db push --schema prisma/schema.postgres.prisma --skip-generate",
+    "db:generate:pg": "prisma generate --schema prisma/schema.postgres.prisma",
+    "db:seed:pg": "prisma generate --schema prisma/schema.postgres.prisma && tsx prisma/seed.ts",
+    "db:setup:pg": "prisma db push --schema prisma/schema.postgres.prisma --skip-generate && prisma generate --schema prisma/schema.postgres.prisma && tsx prisma/seed.ts",
+    "db:reset:pg": "prisma db push --force-reset --schema prisma/schema.postgres.prisma --skip-generate && prisma generate --schema prisma/schema.postgres.prisma && tsx prisma/seed.ts",
+    "avatars": "node scripts/generate-avatars.mjs",
+    "avatars:force": "node scripts/generate-avatars.mjs --all",
+    "validate:figures": "node scripts/validate-figures.mjs",
+    "smoke:debate": "node scripts/smoke-debate.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.1.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.468.0",
+    "next": "^15.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tailwind-merge": "^2.5.5",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "autoprefixer": "^10.4.20",
+    "postcss": "8.5.1",
+    "prisma": "^6.1.0",
+    "sharp": "^0.33.5",
+    "tailwindcss": "3.4.17",
+    "tailwindcss-animate": "^1.0.7",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

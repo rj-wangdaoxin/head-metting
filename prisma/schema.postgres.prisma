@@ -1,0 +1,159 @@
+// 部署用 schema：与 prisma/schema.prisma 结构完全一致，仅 datasource 换作 postgresql。
+// 本地开发继续用 SQLite（默认 schema），云端（Neon / Supabase / Render Postgres）用本文件。
+// 改动数据模型时，两份文件请一并更新。
+//
+// 部署命令：
+//   npx prisma db push --schema prisma/schema.postgres.prisma --skip-generate
+//   npx prisma generate --schema prisma/schema.postgres.prisma
+//   npx tsx prisma/seed.ts
+//
+// 切回本地 SQLite 开发：npx prisma generate（不带 --schema）
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// 本机账号：各人的分身、辩录与后台配置互不干涉
+model User {
+  id           String   @id @default(cuid())
+  name         String   @unique
+  salt         String
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  personas Persona[]
+  sessions DebateSession[]
+  settings Setting[]
+}
+
+/// 内置历史人物本体：历史字段由 seed/figures/*.json 固化，应用层只读不可改
+model Figure {
+  id                String   @id @default(cuid())
+  slug              String   @unique
+  name              String
+  courtesy          String?
+  dynasty           String
+  dynastyOrder      Int
+  category          String
+  birthYear         Int?
+  deathYear         Int?
+  birthplace        String?
+  roles             String   // JSON string[]
+  biography         String
+  personalityTraits String   // JSON string[]
+  speakingStyle     String   // JSON { selfAddress, tone, catchphrases[] }
+  thoughts          String
+  quotes            String   // JSON { text, source }[]
+  anecdotes         String   // JSON string[]
+  expertise         String   // JSON string[]
+  taboos            String   // JSON string[]
+  sources           String   // JSON string[]
+  inkColor          String
+  avatarUrl         String?
+  avatarKind        String   @default("DEFAULT") // QVER | IMAGE | DEFAULT
+  avatarSource      String?
+  enabled           Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  personas Persona[]
+}
+
+/// 用户基于本体派生的分身：仅存差异层
+model Persona {
+  id                  String   @id @default(cuid())
+  figureId            String
+  name                String
+  personalityOverride String?
+  toneStyle           String?
+  knowledgeFocus      String
+  stanceShift         String?
+  extraPrompt         String?
+  strictness          Int      @default(3)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  userId              String
+
+  figure Figure @relation(fields: [figureId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model DebateSession {
+  id              String   @id @default(cuid())
+  topic           String
+  background      String?
+  maxParticipants Int      @default(3)
+  roundLimit      Int      @default(3)
+  language        String   @default("classic") // auto | wenyan | classic | plain
+  currentRound    Int      @default(0)
+  phase           String   @default("NORMAL") // NORMAL | CLOSING | ENDED
+  status          String   @default("ACTIVE") // ACTIVE | ENDED
+  busy            Boolean  @default(false)
+  messageCount    Int      @default(0)
+  tokenUsed       Int      @default(0)
+  extensionCount  Int      @default(0)
+  allowJudgment   Boolean  @default(true)
+  motion          String? // 命题：由话题提炼的可争议是非题，交锋围绕它展开
+  summary         String?
+  judgment        String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  userId          String
+
+  participants DebateParticipant[]
+  messages     Message[]
+  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model DebateParticipant {
+  id            String   @id @default(cuid())
+  sessionId     String
+  kind          String // FIGURE | PERSONA
+  figureId      String
+  personaId     String?
+  displayName   String
+  dynastyLabel  String?
+  categoryLabel String?
+  inkColor      String
+  sealChar      String
+  avatarUrl     String?
+  orderIndex    Int
+  stance        String? // PRO | CON | MID —— 本场阵营，决定发言对阵
+  stanceClaim   String? // 该阵营下此人的一句主张，立论与驳论据此展开
+  closingDone   Boolean  @default(false)
+
+  session DebateSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}
+
+model Message {
+  id            String   @id @default(cuid())
+  sessionId     String
+  participantId String?
+  roleType      String // FIGURE | PERSONA | USER | MODERATOR | SYSTEM
+  speakerName   String
+  round         Int      @default(0)
+  phase         String   @default("NORMAL") // NORMAL | CLOSING
+  content       String
+  truncated     Boolean  @default(false)
+  tokens        Int?
+  createdAt     DateTime @default(now())
+
+  session DebateSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}
+
+/// KV 配置：llm.*、debate.* —— 按账号隔离，每人一套模型密钥与辩论配额
+model Setting {
+  userId String
+  key    String
+  value  String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, key])
+}

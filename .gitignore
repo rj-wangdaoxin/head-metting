@@ -1,0 +1,17 @@
+node_modules
+.next
+out
+build
+*.log
+.DS_Store
+
+# 本地数据库与密钥（含备份）
+prisma/dev.db
+prisma/dev.db*
+.env
+.env.local
+
+# 头像资源由 scripts/generate-avatars.mjs 生成，可重新生成
+public/avatars/*.svg
+public/avatars/*.jpg
+public/avatars/*.webp
